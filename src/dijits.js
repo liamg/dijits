@@ -1,4 +1,4 @@
-(function(){
+(function () {
 
     // Private functions
 
@@ -40,31 +40,31 @@
         19: 'nineteen'
     };
 
-    function getDigitWord(digit){
-        digit = parseInt(digit,10);
+    function getDigitWord(digit) {
+        digit = parseInt(digit, 10);
         return digits[digit];
     }
 
-    function getTensWord(number){
-        number = parseInt(number,10);
+    function getTensWord(number) {
+        number = parseInt(number, 10);
         return tens[number];
     }
 
-    function getTeensWord(number){
-        number = parseInt(number,10);
+    function getTeensWord(number) {
+        number = parseInt(number, 10);
         return teens[number];
     }
 
-    function getThousandsGroupName(numThousandGroups){
+    function getThousandsGroupName(numThousandGroups) {
 
         numThousandGroups = parseInt(numThousandGroups, 10);
 
         var out = '';
 
-        switch(numThousandGroups){
+        switch (numThousandGroups) {
             case 0:
                 out = '';
-            break;
+                break;
             case 1:
                 out = 'thousand';
                 break;
@@ -79,10 +79,10 @@
                 break;
             default:
                 var b = numThousandGroups % 4;
-                if(b !== 0){
+                if (b !== 0) {
                     out = getThousandsGroupName(b);
                 }
-                while(numThousandGroups > 4){
+                while (numThousandGroups > 4) {
                     numThousandGroups -= 4;
                     out += ' trillion';
                 }
@@ -95,68 +95,70 @@
 
     var dijits = {};
 
-    dijits.numberToWords = function(number){
+    dijits.numberToWords = function (number) {
 
+        //remove weird characters from number, in case provided as string
         var numberStr = number.toString().replace(/[^0-9\.]/g, '');
         var decimalStr = '';
 
-        if(numberStr.indexOf('.') !== -1){
+        //get numbers after decimal point
+        if (numberStr.indexOf('.') !== -1) {
             var parts = numberStr.split('.', 2);
             numberStr = parts[0];
             decimalStr = parts[1].replace(/[^0-9]/g, '');
         }
 
-        var thousandGroups = Math.ceil(numberStr.length / 3);
-
-        while(numberStr.length % 3 > 0 || numberStr.length === 0){
+        //make sure number of digits is divisable by 3, so we can separate groups of thousands - 17,823 becomes 017823
+        while (numberStr.length % 3 > 0 || numberStr.length === 0) {
             numberStr = '0' + numberStr;
         }
 
+        //split number into "thousand" groups - so 23,236,234 becomes ['023','236','234']
         var groups = numberStr.match(/[0-9]{1,3}/g);
-
         var output = '';
         var groupOutput = '';
-
         var groupName = '';
-
         var anded = false;
 
-        for(var i =0; i < groups.length; i++){
+        for (var i = 0; i < groups.length; i++) {
 
             anded = false;
 
             groupOutput = '';
-            groupName = getThousandsGroupName(groups.length-(i+1));
+            groupName = getThousandsGroupName(groups.length - (i + 1));
 
-            if(groups[i] === '000'){
-                if(i === 0){
+            if (groups[i] === '000') {
+                if (i === 0) {
                     groupOutput += getDigitWord(0) + ' ';
-                }else{
+                } else {
                     continue;
                 }
             }
 
-            if(groups[i][0] !== '0'){
+            // add hundreds for group
+            if (groups[i][0] !== '0') {
                 groupOutput += getDigitWord(groups[i][0]) + ' hundred ';
             }
 
-            if(groups[i][1] === '1'){
-                if((groupOutput !== '' || i > 0) && !anded){
+            // add tens/teens for group
+            if (groups[i][1] === '1') {
+                if ((groupOutput !== '' || i > 0) && !anded) {
                     anded = true;
                     groupOutput += 'and ';
                 }
                 groupOutput += getTeensWord(groups[i][1] + groups[i][2]) + ' ';
-            }else if(groups[i][1] !== '0'){
-                if((groupOutput !== '' || i > 0) && !anded){
+            } else if (groups[i][1] !== '0') {
+                if ((groupOutput !== '' || i > 0) && !anded) {
                     anded = true;
                     groupOutput += 'and ';
                 }
                 groupOutput += getTensWord(groups[i][1] + '0') + ' ';
             }
 
-            if(groups[i][2] !== '0' && groups[i][1] !== '1'){
+            // add single digits for group
+            if (groups[i][2] !== '0' && groups[i][1] !== '1') {
 
-                if((groupOutput !== '' || i > 0) && !anded){
+                if ((groupOutput !== '' || i > 0) && !anded && groups[i][1] === '0') {
                     anded = true;
                     groupOutput += 'and ';
                 }
@@ -167,15 +169,15 @@
             output += groupOutput + groupName + ' ';
         }
 
-        if(decimalStr !== ''){
+        //add decimals
+        if (decimalStr !== '') {
             output += 'point ';
-            for(var j = 0; j < decimalStr.length; j++){
+            for (var j = 0; j < decimalStr.length; j++) {
                 output += getDigitWord(decimalStr[j]) + ' ';
             }
         }
 
-        return output.replace(/^\s*/, '').replace(/\s*$/, '').replace(/\s\s/, ' ');
-
+        return output.replace(/^\s*/, '').replace(/\s*$/, '').replace(/\s\s+/, ' ');
     };
 
     this.dijits = dijits;

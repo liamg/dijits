@@ -12,3 +12,17 @@ Build
 
     $ npm install
     $ grunt
+
+Usage
+-----
+
+Include the built file at `dist/dijits.min.js` in your web page.
+
+You can now use dijits like this:
+
+```javascript
+dijits.numberToWords(17); // Outputs "seventeen"
+dijits.numberToWords(8.6); // Outputs "eight point six"
+dijits.numberToWords(100000000000); // Outputs "one hundred billion"
+dijits.numberToWords(999); // Outputs "nine hundred and ninety nine"
+```
