@@ -1,6 +1,5 @@
 (function(){
 
-
     // Private functions
 
     var digits = {
